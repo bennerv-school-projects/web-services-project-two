@@ -15,7 +15,7 @@ public class CoordinatorApplication {
 		SpringApplication.run(CoordinatorApplication.class, args);
 	}
 
-	@RequestMapping(value = "/")
+	@RequestMapping(value = "/home")
     public String home() {
 	    return "Eureka server home";
     }
