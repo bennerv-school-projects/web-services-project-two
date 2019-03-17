@@ -8,15 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @EnableEurekaServer
-@RestController
 public class CoordinatorApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CoordinatorApplication.class, args);
 	}
-
-	@RequestMapping(value = "/home")
-    public String home() {
-	    return "Eureka server home";
-    }
 }
