@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RegistrationController {
 
+    private final DiscoveryClient discoveryClient;
+
     @Autowired
-    private DiscoveryClient discoveryClient;
+    public RegistrationController(DiscoveryClient discoveryClient) {
+        this.discoveryClient = discoveryClient;
+    }
 
     @RequestMapping(value = "/")
     public String home() {
