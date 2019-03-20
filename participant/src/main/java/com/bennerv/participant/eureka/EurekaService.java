@@ -42,14 +42,5 @@ public class EurekaService {
         return participants.get(random);
     }
 
-    public ServiceInstance getCoordinator() {
-        for (String service : discoveryClient.getServices()) {
-            if (!service.equals(appName)) {
-                return discoveryClient.getInstances(service).get(0);
-            }
-        }
-        return null;
-    }
-
 }
 
