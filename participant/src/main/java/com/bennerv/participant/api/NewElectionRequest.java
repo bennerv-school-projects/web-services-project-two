@@ -1,6 +1,9 @@
-package com.bennerv.coordinator.election.Api;
+package com.bennerv.participant.api;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 

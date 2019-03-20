@@ -1,6 +1,6 @@
 package com.bennerv.coordinator.election;
 
-import com.bennerv.coordinator.election.Api.VoteForParticipantBody;
+import com.bennerv.coordinator.api.VoteForParticipantBody;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -36,7 +36,7 @@ public class ElectionController {
     }
 
     @CrossOrigin
-    @RequestMapping(path = "/vote", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/castvote", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Boolean> vote(@RequestBody VoteForParticipantBody voteRequest) {
         if (voteRequest == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

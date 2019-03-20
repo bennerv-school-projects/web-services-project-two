@@ -1,4 +1,4 @@
-package com.bennerv.coordinator.election.Api;
+package com.bennerv.coordinator.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
