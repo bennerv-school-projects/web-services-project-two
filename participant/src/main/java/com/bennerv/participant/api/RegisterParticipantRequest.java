@@ -1,4 +1,5 @@
-package com.bennerv.coordinator.api;
+package com.bennerv.participant.api;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +12,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WinnerRequest {
+public class RegisterParticipantRequest {
 
     @NotNull
-    public int electionNumber;
+    String host;
 
     @NotNull
-    public int winner;
+    Integer port;
 }

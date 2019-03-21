@@ -1,9 +1,9 @@
 package com.bennerv.coordinator.election;
 
 import com.bennerv.coordinator.api.VoteForParticipantBody;
+import com.bennerv.coordinator.participant.ParticipantEntity;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +22,17 @@ public class ElectionController {
 
     @CrossOrigin
     @RequestMapping(path = "/election", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ServiceInstance> beginElection() {
+    public String beginElection() {
         int electionNumber = ElectionNumber.getUniqueElectionNumber();
         log.info("Election " + electionNumber + ": Request to begin election");
-        ServiceInstance initiator = electionService.beginElection(electionNumber);
+        ParticipantEntity participant = electionService.beginElection(electionNumber);
 
-        if (initiator == null) {
-            log.info("Election " + electionNumber + ": Failed to select an initiator");
-            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        if (participant == null) {
+            log.info("Election " + electionNumber + ": Failed to select an initiator.  There are no participants");
+            return "Election " + electionNumber + ": No participants connected!";
         }
-        log.info("Election " + electionNumber + ": Initiator selected: " + initiator.getPort());
-        return ResponseEntity.ok(initiator);
+        log.info("Election " + electionNumber + ": Initiator selected: " + participant.getPort());
+        return "Election " + electionNumber + ": Started!";
     }
 
     @CrossOrigin

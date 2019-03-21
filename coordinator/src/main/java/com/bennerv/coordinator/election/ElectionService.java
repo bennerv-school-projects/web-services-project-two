@@ -1,12 +1,12 @@
 package com.bennerv.coordinator.election;
 
+import com.bennerv.coordinator.api.AnnounceWinnerBody;
 import com.bennerv.coordinator.api.NewElectionRequest;
 import com.bennerv.coordinator.api.VoteForParticipantBody;
-import com.bennerv.coordinator.api.WinnerRequest;
-import com.bennerv.coordinator.eureka.EurekaService;
+import com.bennerv.coordinator.participant.ParticipantEntity;
+import com.bennerv.coordinator.participant.ParticipantService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,18 +21,18 @@ public class ElectionService {
 
     private static final String INITIATE_ENDPOINT = "/initiate";
     private static final String WINNER_ENDPOINT = "/winner";
-    private final EurekaService eurekaService;
+    private final ParticipantService participantService;
     private final VoteRepository voteRepository;
 
 
     @Autowired
-    public ElectionService(VoteRepository voteRepository, EurekaService eurekaService) {
+    public ElectionService(VoteRepository voteRepository, ParticipantService participantService) {
         this.voteRepository = voteRepository;
-        this.eurekaService = eurekaService;
+        this.participantService = participantService;
     }
 
-    ServiceInstance beginElection(int electionNumber) {
-        ServiceInstance initiator = eurekaService.getRandomParticipant();
+    ParticipantEntity beginElection(int electionNumber) {
+        ParticipantEntity initiator = participantService.getRandomParticipant();
         if (initiator == null) {
             return null;
         }
@@ -47,7 +47,7 @@ public class ElectionService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<NewElectionRequest> request = new HttpEntity<>(electionRequest, headers);
-        ResponseEntity<VoteForParticipantBody> voteResponseResponseEntity = restTemplate.exchange("http://" + initiator.getHost() + ":" + initiator.getPort() + INITIATE_ENDPOINT, HttpMethod.POST, request, VoteForParticipantBody.class);
+        ResponseEntity<VoteForParticipantBody> voteResponseResponseEntity = restTemplate.exchange("http://" + initiator.getHostname() + ":" + initiator.getPort() + INITIATE_ENDPOINT, HttpMethod.POST, request, VoteForParticipantBody.class);
 
         // Initiator casts vote
         this.castVote(voteResponseResponseEntity.getBody());
@@ -73,13 +73,13 @@ public class ElectionService {
 
     private void checkElectionFinished(int electionNumber) {
         int totalVotes = voteRepository.countByElectionNumber(electionNumber);
-        int totalVoters = eurekaService.getParticipants().size();
+        int totalVoters = participantService.getParticipants().size();
         int winner = getWinner(electionNumber);
 
         if (totalVotes == totalVoters) {
-            List<ServiceInstance> participants = eurekaService.getParticipants();
+            List<ParticipantEntity> participants = participantService.getParticipants();
 
-            WinnerRequest winnerRequest = WinnerRequest.builder()
+            AnnounceWinnerBody winnerRequest = AnnounceWinnerBody.builder()
                     .electionNumber(electionNumber)
                     .winner(winner)
                     .build();
@@ -90,11 +90,11 @@ public class ElectionService {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<WinnerRequest> request = new HttpEntity<>(winnerRequest, headers);
+            HttpEntity<AnnounceWinnerBody> request = new HttpEntity<>(winnerRequest, headers);
 
             // Notify every participant of the winner
-            for (ServiceInstance participant : participants) {
-                restTemplate.exchange("http://" + participant.getHost() + ":" + participant.getPort() + WINNER_ENDPOINT, HttpMethod.POST, request, Boolean.class);
+            for (ParticipantEntity participant : participants) {
+                restTemplate.exchange("http://" + participant.getHostname() + ":" + participant.getPort() + WINNER_ENDPOINT, HttpMethod.POST, request, Boolean.class);
             }
         }
     }
