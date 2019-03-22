@@ -7,6 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ParticipantController {
 
@@ -28,5 +30,17 @@ public class ParticipantController {
         return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
     }
 
+    @CrossOrigin
+    @RequestMapping(value = "/participants", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ParticipantEntity[]> getParticipants() {
+        List<ParticipantEntity> participants = participantService.getParticipants();
 
+        if (participants == null || participants.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+
+        ParticipantEntity[] participantEntities = participants.toArray(new ParticipantEntity[0]);
+
+        return ResponseEntity.ok(participantEntities);
+    }
 }

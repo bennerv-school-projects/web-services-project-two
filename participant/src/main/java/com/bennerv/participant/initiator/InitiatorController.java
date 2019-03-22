@@ -3,6 +3,7 @@ package com.bennerv.participant.initiator;
 
 import com.bennerv.participant.api.NewElectionRequest;
 import com.bennerv.participant.api.VoteForParticipantBody;
+import com.bennerv.participant.register.ParticipantEntity;
 import com.bennerv.participant.register.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -30,16 +31,14 @@ public class InitiatorController {
     @RequestMapping(path = "/initiate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<VoteForParticipantBody> becomeInitiate(@RequestBody NewElectionRequest newElection) {
 
+        // Get a random participant to vote for them
+        ParticipantEntity randomParticipant = registrationService.getRandomParticipant();
+        VoteForParticipantBody vote = VoteForParticipantBody.builder()
+                .electionNumber(newElection.getElectionNumber())
+                .vote(randomParticipant.getPort())
+                .voter(registrationService.getPort())
+                .build();
 
-//        // Get a random participant to vote for them
-//        ServiceInstance randomParticipant = registrationService.getRandomParticipant();
-//        VoteForParticipantBody vote = VoteForParticipantBody.builder()
-//                .electionNumber(newElection.getElectionNumber())
-//                .vote(randomParticipant.getPort())
-//                .voter(voter)
-//                .build();
-//
-//        return ResponseEntity.ok(vote);
-        return null;
+        return ResponseEntity.ok(vote);
     }
 }

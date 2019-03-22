@@ -7,14 +7,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Log4j2
 @Service
@@ -40,7 +42,7 @@ public class RegistrationService {
                 .build();
 
         ResponseEntity<Boolean> registerResponse = restTemplate.postForEntity(observerUrl + "/register", registerRequest, Boolean.class);
-        if(!registerResponse.getStatusCode().equals(HttpStatus.CREATED)) {
+        if (!registerResponse.getStatusCode().equals(HttpStatus.CREATED)) {
             log.error("Failed to create participant.  This will not work :(");
         } else {
             log.info("Registered participant " + getPort() + " with the observer");
@@ -55,10 +57,31 @@ public class RegistrationService {
         String hostname = null;
         try {
             hostname = InetAddress.getLocalHost().getHostName();
-        } catch(UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             log.error("Failed to get the hostname of the participant.  This won't work :(");
         }
         return hostname;
+    }
+
+    public ParticipantEntity[] getParticipants() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ParticipantEntity[]> response = restTemplate.exchange(observerUrl + "/participants", HttpMethod.GET, null, ParticipantEntity[].class);
+
+        if(!response.getStatusCode().equals(HttpStatus.OK)) {
+            return null;
+        }
+
+        return response.getBody();
+    }
+
+    public ParticipantEntity getRandomParticipant() {
+        ParticipantEntity[] participants = getParticipants();
+
+        if(participants == null || participants.length == 0) {
+            return null;
+        }
+
+        return participants[ThreadLocalRandom.current().nextInt(0, participants.length)];
     }
 }
 
