@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Log4j2
@@ -67,7 +66,7 @@ public class RegistrationService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<ParticipantEntity[]> response = restTemplate.exchange(observerUrl + "/participants", HttpMethod.GET, null, ParticipantEntity[].class);
 
-        if(!response.getStatusCode().equals(HttpStatus.OK)) {
+        if (!response.getStatusCode().equals(HttpStatus.OK)) {
             return null;
         }
 
@@ -77,7 +76,7 @@ public class RegistrationService {
     public ParticipantEntity getRandomParticipant() {
         ParticipantEntity[] participants = getParticipants();
 
-        if(participants == null || participants.length == 0) {
+        if (participants == null || participants.length == 0) {
             return null;
         }
 

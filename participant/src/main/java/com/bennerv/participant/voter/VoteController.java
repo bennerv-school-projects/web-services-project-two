@@ -1,21 +1,48 @@
 package com.bennerv.participant.voter;
 
 
+import com.bennerv.participant.api.AnnounceWinnerBody;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
+@Log4j2
 @Controller
 public class VoteController {
 
+    @Autowired
+    private final VoteService voteService;
+
+    public VoteController(VoteService voteService) {
+        this.voteService = voteService;
+    }
+
     @CrossOrigin
-    @RequestMapping(path = "/vote", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> vote(@RequestBody boolean temp) {
-        return null;
+    @RequestMapping(path = "/vote", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> vote(@RequestParam Integer electionNumber) {
+
+        boolean success = voteService.voteForParticipant(electionNumber);
+
+        if (!success) {
+            return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @CrossOrigin
+    @RequestMapping(path = "/winner", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getWinner(@RequestBody AnnounceWinnerBody request) {
+        if (request == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        log.info("Election " + request.getElectionNumber() + ": Informed of winner " + request.getWinner());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

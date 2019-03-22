@@ -33,9 +33,7 @@ public class ElectionService {
 
     ParticipantEntity beginElection(int electionNumber) {
         ParticipantEntity initiator = participantService.getRandomParticipant();
-        if (initiator == null) {
-            return null;
-        }
+        log.info("Election " + electionNumber + ": Initiator selected: " + initiator.getPort());
 
         // Initiator request
         NewElectionRequest electionRequest = NewElectionRequest.builder()
@@ -47,10 +45,9 @@ public class ElectionService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<NewElectionRequest> request = new HttpEntity<>(electionRequest, headers);
-        ResponseEntity<VoteForParticipantBody> voteResponseResponseEntity = restTemplate.exchange("http://" + initiator.getHostname() + ":" + initiator.getPort() + INITIATE_ENDPOINT, HttpMethod.POST, request, VoteForParticipantBody.class);
+        restTemplate.exchange("http://" + initiator.getHostname() + ":" + initiator.getPort() + INITIATE_ENDPOINT, HttpMethod.POST, request, VoteForParticipantBody.class);
 
         // Initiator casts vote
-        this.castVote(voteResponseResponseEntity.getBody());
         return initiator;
     }
 
@@ -74,9 +71,9 @@ public class ElectionService {
     private void checkElectionFinished(int electionNumber) {
         int totalVotes = voteRepository.countByElectionNumber(electionNumber);
         int totalVoters = participantService.getParticipants().size();
-        int winner = getWinner(electionNumber);
 
         if (totalVotes == totalVoters) {
+            int winner = getWinner(electionNumber);
             List<ParticipantEntity> participants = participantService.getParticipants();
 
             AnnounceWinnerBody winnerRequest = AnnounceWinnerBody.builder()
@@ -106,16 +103,17 @@ public class ElectionService {
 
         // Tally votes into a map (voterId, numberOfVotesForThem)
         for (VoteEntity vote : votes) {
-            if (votesForParticipant.containsKey(vote.getVoterId())) {
-                votesForParticipant.put(vote.getVoterId(), votesForParticipant.get(vote.getVoterId()) + 1);
+            if (votesForParticipant.containsKey(vote.getVote())) {
+                votesForParticipant.put(vote.getVote(), votesForParticipant.get(vote.getVote()) + 1);
             } else {
-                votesForParticipant.put(vote.getVoterId(), 1);
-                winner = vote.getVoterId();
+                votesForParticipant.put(vote.getVote(), 1);
+                winner = vote.getVote();
             }
         }
 
         // Get the person with the most votes
         for (Integer key : votesForParticipant.keySet()) {
+            log.info("Election " + electionNumber + ": Participant " + key +  " has " + votesForParticipant.get(key) + " votes");
             if (votesForParticipant.get(key) > votesForParticipant.get(winner)) {
                 winner = key;
             }

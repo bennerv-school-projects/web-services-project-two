@@ -2,11 +2,9 @@ package com.bennerv.participant.initiator;
 
 
 import com.bennerv.participant.api.NewElectionRequest;
-import com.bennerv.participant.api.VoteForParticipantBody;
-import com.bennerv.participant.register.ParticipantEntity;
-import com.bennerv.participant.register.RegistrationService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,30 +13,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+@Log4j2
 @Controller
 public class InitiatorController {
 
-    private final RegistrationService registrationService;
-    private Environment environment;
+    private final InitiatorService initiatorService;
 
     @Autowired
-    public InitiatorController(Environment environment, RegistrationService registrationService) {
-        this.environment = environment;
-        this.registrationService = registrationService;
+    public InitiatorController(InitiatorService initiatorService) {
+        this.initiatorService = initiatorService;
     }
 
     @CrossOrigin
     @RequestMapping(path = "/initiate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<VoteForParticipantBody> becomeInitiate(@RequestBody NewElectionRequest newElection) {
+    public ResponseEntity<Object> becomeInitiate(@RequestBody NewElectionRequest newElection) {
+        boolean success = initiatorService.initiateElection(newElection.getElectionNumber());
 
-        // Get a random participant to vote for them
-        ParticipantEntity randomParticipant = registrationService.getRandomParticipant();
-        VoteForParticipantBody vote = VoteForParticipantBody.builder()
-                .electionNumber(newElection.getElectionNumber())
-                .vote(randomParticipant.getPort())
-                .voter(registrationService.getPort())
-                .build();
+        if (success) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
 
-        return ResponseEntity.ok(vote);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

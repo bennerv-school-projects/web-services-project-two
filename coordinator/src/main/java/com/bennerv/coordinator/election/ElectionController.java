@@ -31,18 +31,17 @@ public class ElectionController {
             log.info("Election " + electionNumber + ": Failed to select an initiator.  There are no participants");
             return "Election " + electionNumber + ": No participants connected!";
         }
-        log.info("Election " + electionNumber + ": Initiator selected: " + participant.getPort());
         return "Election " + electionNumber + ": Started!";
     }
 
     @CrossOrigin
     @RequestMapping(path = "/castvote", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> vote(@RequestBody VoteForParticipantBody voteRequest) {
+    public ResponseEntity<Object> vote(@RequestBody VoteForParticipantBody voteRequest) {
         if (voteRequest == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         electionService.castVote(voteRequest);
-        return ResponseEntity.ok(true);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

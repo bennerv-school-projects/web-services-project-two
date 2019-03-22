@@ -21,7 +21,7 @@ public class ParticipantController {
 
     @CrossOrigin
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> registerParticipant(@RequestBody RegisterParticipantRequest request) {
+    public ResponseEntity<Object> registerParticipant(@RequestBody RegisterParticipantRequest request) {
         boolean success = participantService.registerParticipant(request);
 
         if (success) {
