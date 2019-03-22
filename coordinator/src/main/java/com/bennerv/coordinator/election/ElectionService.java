@@ -113,7 +113,6 @@ public class ElectionService {
 
         // Get the person with the most votes
         for (Integer key : votesForParticipant.keySet()) {
-            log.info("Election " + electionNumber + ": Participant " + key +  " has " + votesForParticipant.get(key) + " votes");
             if (votesForParticipant.get(key) > votesForParticipant.get(winner)) {
                 winner = key;
             }

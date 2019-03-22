@@ -1,6 +1,5 @@
 package com.bennerv.participant.voter;
 
-import com.bennerv.participant.api.NewElectionRequest;
 import com.bennerv.participant.api.VoteForParticipantBody;
 import com.bennerv.participant.register.ParticipantEntity;
 import com.bennerv.participant.register.RegistrationService;
@@ -27,7 +26,7 @@ public class VoteService {
 
     public boolean voteForParticipant(Integer electionNumber) {
         ParticipantEntity randomParticipant = registrationService.getRandomParticipant();
-        log.info("Election " + electionNumber + ": Participant " + registrationService.getPort() + " + voting for " + randomParticipant.getPort());
+        log.info("Election " + electionNumber + ": Participant " + registrationService.getPort() + " voting for " + randomParticipant.getPort());
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
