@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.html.HTMLDocument;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -35,9 +36,14 @@ public class RegistrationService {
     public void registerOnInit() {
         RestTemplate restTemplate = new RestTemplate();
 
+        long initialTime = System.currentTimeMillis();
+        restTemplate.exchange("https://www.umdearborn.edu", HttpMethod.GET, null, String.class);
+        long totalTime = System.currentTimeMillis() - initialTime;
+
         RegisterParticipantRequest registerRequest = RegisterParticipantRequest.builder()
                 .host(getHostname())
                 .port(getPort())
+                .ping(totalTime)
                 .build();
 
         ResponseEntity<Boolean> registerResponse = restTemplate.postForEntity(observerUrl + "/register", registerRequest, Boolean.class);
@@ -81,6 +87,23 @@ public class RegistrationService {
         }
 
         return participants[ThreadLocalRandom.current().nextInt(0, participants.length)];
+    }
+
+    public ParticipantEntity getFastestParticipant() {
+        ParticipantEntity[] participants = getParticipants();
+
+        if (participants == null || participants.length == 0) {
+            return null;
+        }
+
+        int fastestPingEntity = 0;
+        for(int i = 1; i < participants.length; i++) {
+            if(participants[i].getPing() < participants[fastestPingEntity].getPing()) {
+                fastestPingEntity = i;
+            }
+        }
+
+        return participants[fastestPingEntity];
     }
 }
 

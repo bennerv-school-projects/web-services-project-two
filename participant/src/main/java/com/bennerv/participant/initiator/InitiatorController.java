@@ -27,7 +27,7 @@ public class InitiatorController {
     @CrossOrigin
     @RequestMapping(path = "/initiate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> becomeInitiate(@RequestBody NewElectionRequest newElection) {
-        boolean success = initiatorService.initiateElection(newElection.getElectionNumber());
+        boolean success = initiatorService.initiateElection(newElection.getElectionNumber(), newElection.getAlgorithm());
 
         if (success) {
             return new ResponseEntity<>(HttpStatus.OK);

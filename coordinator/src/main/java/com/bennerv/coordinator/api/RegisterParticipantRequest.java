@@ -19,4 +19,7 @@ public class RegisterParticipantRequest {
 
     @NotNull
     Integer port;
+
+    @NotNull
+    Long ping;
 }

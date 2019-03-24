@@ -16,4 +16,7 @@ public class NewElectionRequest {
     @NotNull
     Integer electionNumber;
 
+    @NotNull
+    String algorithm;
+
 }

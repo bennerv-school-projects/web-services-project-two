@@ -29,4 +29,8 @@ public class ParticipantEntity {
     @Column(name = "HOST_NAME")
     private String hostname;
 
+
+    @NotNull
+    @Column(name = "PING_SPEED")
+    private long ping;
 }

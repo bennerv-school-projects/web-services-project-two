@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,5 +20,7 @@ public class ParticipantEntity {
     private Integer port;
 
     private String hostname;
+
+    private long ping;
 
 }

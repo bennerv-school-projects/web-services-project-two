@@ -10,22 +10,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
+
 @Log4j2
 @Controller
 public class VoteController {
 
-    @Autowired
     private final VoteService voteService;
 
+    @Autowired
     public VoteController(VoteService voteService) {
         this.voteService = voteService;
     }
 
     @CrossOrigin
     @RequestMapping(path = "/vote", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Boolean> vote(@RequestParam Integer electionNumber) {
+    public ResponseEntity<Boolean> vote(@RequestParam @NotNull Integer electionNumber, @RequestParam @NotNull String algorithm) {
 
-        boolean success = voteService.voteForParticipant(electionNumber);
+        boolean success = voteService.voteForParticipant(electionNumber, algorithm);
 
         if (!success) {
             return new ResponseEntity<>(HttpStatus.FAILED_DEPENDENCY);

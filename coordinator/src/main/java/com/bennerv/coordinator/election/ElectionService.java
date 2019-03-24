@@ -31,13 +31,14 @@ public class ElectionService {
         this.participantService = participantService;
     }
 
-    ParticipantEntity beginElection(int electionNumber) {
+    ParticipantEntity beginElection(int electionNumber, String algorithm) {
         ParticipantEntity initiator = participantService.getRandomParticipant();
         log.info("Election " + electionNumber + ": Initiator selected: " + initiator.getPort());
 
         // Initiator request
         NewElectionRequest electionRequest = NewElectionRequest.builder()
                 .electionNumber(electionNumber)
+                .algorithm(algorithm)
                 .build();
 
         // Tell a service that they are the initiator

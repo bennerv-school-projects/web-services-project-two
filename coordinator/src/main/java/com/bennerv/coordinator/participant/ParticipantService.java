@@ -27,6 +27,7 @@ public class ParticipantService {
         ParticipantEntity participantEntity = ParticipantEntity.builder()
                 .hostname(request.getHost())
                 .port(request.getPort())
+                .ping(request.getPing())
                 .build();
 
         if (participantRepository.existsParticipantEntityByPort(request.getPort())) {

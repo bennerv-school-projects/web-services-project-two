@@ -22,10 +22,10 @@ public class ElectionController {
 
     @CrossOrigin
     @RequestMapping(path = "/election", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String beginElection() {
+    public String beginElection(@RequestParam String algorithm) {
         int electionNumber = ElectionNumber.getUniqueElectionNumber();
         log.info("Election " + electionNumber + ": Request to begin election");
-        ParticipantEntity participant = electionService.beginElection(electionNumber);
+        ParticipantEntity participant = electionService.beginElection(electionNumber, algorithm);
 
         if (participant == null) {
             log.info("Election " + electionNumber + ": Failed to select an initiator.  There are no participants");

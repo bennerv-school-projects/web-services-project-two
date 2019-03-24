@@ -24,9 +24,16 @@ public class VoteService {
         this.registrationService = registrationService;
     }
 
-    public boolean voteForParticipant(Integer electionNumber) {
-        ParticipantEntity randomParticipant = registrationService.getRandomParticipant();
-        log.info("Election " + electionNumber + ": Participant " + registrationService.getPort() + " voting for " + randomParticipant.getPort());
+    public boolean voteForParticipant(Integer electionNumber, String algorithm) {
+        ParticipantEntity selectedParticipant;
+
+        if (algorithm.equalsIgnoreCase("FASTEST") || algorithm.equalsIgnoreCase("FAST")) {
+            selectedParticipant = registrationService.getFastestParticipant();
+        } else {
+            selectedParticipant = registrationService.getRandomParticipant();
+        }
+
+        log.info("Election " + electionNumber + ": Participant " + registrationService.getPort() + " voting for " + selectedParticipant.getPort());
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -35,7 +42,7 @@ public class VoteService {
         VoteForParticipantBody voteRequestBody = VoteForParticipantBody.builder()
                 .electionNumber(electionNumber)
                 .voter(registrationService.getPort())
-                .vote(randomParticipant.getPort())
+                .vote(selectedParticipant.getPort())
                 .build();
 
         HttpEntity<VoteForParticipantBody> voteRequest = new HttpEntity<>(voteRequestBody, headers);

@@ -22,8 +22,8 @@ public class InitiatorService {
     }
 
 
-    public boolean initiateElection(Integer electionNumber) {
-        boolean success = voteService.voteForParticipant(electionNumber);
+    public boolean initiateElection(Integer electionNumber, String algorithm) {
+        boolean success = voteService.voteForParticipant(electionNumber, algorithm);
 
         // Send /vote request to every participant
         RestTemplate restTemplate = new RestTemplate();
@@ -31,7 +31,7 @@ public class InitiatorService {
         for (ParticipantEntity participant : registrationService.getParticipants()) {
             // Make sure initiator doesn't vote twice
             if (!participant.getPort().equals(registrationService.getPort())) {
-                restTemplate.getForEntity("http://" + participant.getHostname() + ":" + participant.getPort() + "/vote?electionNumber=" + electionNumber, Object.class);
+                restTemplate.getForEntity("http://" + participant.getHostname() + ":" + participant.getPort() + "/vote?electionNumber=" + electionNumber + "&algorithm=" + algorithm, Object.class);
             }
         }
 
